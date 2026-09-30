@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Token Management System - Team Reflex Squad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            950: '#070C1E',
+                            900: '#0A1128',
+                            850: '#0F1A3A',
+                            800: '#14234C',
+                            700: '#1C2D5A',
+                            600: '#2A3F78',
+                        },
+                        teal: {
+                            accent: '#00D285',
+                            glow: '#00E676',
+                            hover: '#00B873',
+                        },
+                        cyan: {
+                            accent: '#00A8E8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070C1E;
+            color: #E2E8F0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(20, 35, 76, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-interactive {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card-interactive:hover {
+            border-color: rgba(0, 210, 133, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 210, 133, 0.12);
+        }
+
+        .badge-serving {
+            background: rgba(0, 210, 133, 0.15);
+            color: #00D285;
+            border: 1px solid rgba(0, 210, 133, 0.3);
+        }
+
+        .badge-waiting {
+            background: rgba(245, 158, 11, 0.15);
+            color: #FBBF24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-priority {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-completed {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070C1E;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1C2D5A;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00D285;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 210, 133, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(0, 210, 133, 0.5); }
+        }
+
+        .pulse-now-serving {
+            animation: pulseGlow 2s infinite;
+        }
+
+
+        /* ================= MOBILE-FIRST RESPONSIVE LAYER ================= */
+        * { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        button, input, select, textarea { font: inherit; }
+        button { -webkit-tap-highlight-color: transparent; }
+
+        @media (max-width: 1023px) {
+            body { min-width: 0; overflow-x: hidden; }
+            main { min-width: 0; width: 100%; }
+            header { min-height: 64px; }
+            #sidebar { max-width: 86vw; box-shadow: 18px 0 45px rgba(0,0,0,.35); }
+            #sidebarOverlay { z-index: 29; }
+        }
+
+        @media (max-width: 640px) {
+            body { font-size: 14px; padding-bottom: env(safe-area-inset-bottom); }
+
+            /* Compact mobile header */
+            header {
+                padding: 9px 10px !important;
+                gap: 8px;
+                align-items: center;
+            }
+            header > div:first-child { min-width: 0; flex: 1; gap: 7px; }
+            header > div:first-child > div:last-child { min-width: 0; }
+            header h1 { font-size: 15px !important; }
+            header p {
+                font-size: 9px !important;
+                line-height: 1.25 !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 210px;
+            }
+            header .w-10.h-10 {
+                width: 36px !important;
+                height: 36px !important;
+                min-width: 36px;
+            }
+            #mobileMenuBtn { padding: 8px !important; }
+            #quickRoleSwitch { gap: 1px; padding: 3px; }
+            #quickRoleSwitch button {
+                padding: 7px 8px !important;
+                font-size: 10px !important;
+                line-height: 1;
+            }
+
+            /* Main content breathing room */
+            main { padding-left: 10px !important; padding-right: 10px !important; }
+            main > section { width: 100%; max-width: 100%; }
+            .glass-card { border-radius: 16px !important; }
+            .glass-card-interactive:hover { transform: none; }
+
+            /* Hero / dashboard cards */
+            .glass-card.p-6, .glass-card.p-8 {
+                padding: 16px !important;
+            }
+            .grid { min-width: 0; }
+            .grid > * { min-width: 0; }
+
+            /* Make touch targets comfortable */
+            button, a[role="button"], nav a {
+                min-height: 40px;
+            }
+            input, select, textarea {
+                min-height: 44px;
+                font-size: 16px !important;
+            }
+            textarea { min-height: 100px; }
+
+            /* Two-column phone grids stay balanced */
+            .grid.grid-cols-2 { gap: 8px !important; }
+            .grid.grid-cols-2 > * { min-width: 0; }
+
+            /* Service cards / action buttons */
+            #serviceOptions > *, .grid.grid-cols-2 > button {
+                min-height: 76px;
+            }
+
+            /* Tables: preserve all data without breaking the viewport */
+            .overflow-x-auto {
+                width: 100%;
+                max-width: 100%;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+            .overflow-x-auto table {
+                min-width: 620px;
+                font-size: 11px;
+            }
+            .overflow-x-auto th, .overflow-x-auto td {
+                padding: 9px 10px !important;
+                white-space: nowrap;
+            }
+
+            /* Modal fits small phones */
+            #ticketModal { padding: 10px !important; }
+            #ticketModal > div {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: calc(100dvh - 20px);
+                overflow-y: auto;
+                border-radius: 18px !important;
+            }
+
+            /* Sidebar mobile polish */
+            #sidebar { width: min(300px, 86vw) !important; padding: 14px !important; }
+            #sidebar nav a { padding-top: 11px !important; padding-bottom: 11px !important; }
+
+            /* Prevent long text from creating horizontal overflow */
+            h1, h2, h3, h4, p, span, label, .truncate { overflow-wrap: anywhere; }
+            .whitespace-nowrap { white-space: nowrap !important; overflow-wrap: normal; }
+
+            /* Fixed/absolute decorative elements should never widen the page */
+            [class*="absolute"] { max-width: 100%; }
+
+            /* Better mobile footer spacing */
+            footer { padding-left: 12px !important; padding-right: 12px !important; }
+        }
+
+        @media (max-width: 380px) {
+            header p { max-width: 150px; }
+            #quickRoleSwitch button { padding-left: 6px !important; padding-right: 6px !important; font-size: 9px !important; }
+            main { padding-left: 8px !important; padding-right: 8px !important; }
+            .grid.grid-cols-2 { gap: 6px !important; }
+        }
+
+        @media (orientation: landscape) and (max-width: 900px) {
+            #sidebar { overflow-y: auto; }
+            #ticketModal > div { max-height: calc(100dvh - 16px); }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-navy-900/90 backdrop-blur-md border-b border-navy-700 sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <button id="mobileMenuBtn" onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-teal-accent p-2 rounded-lg bg-navy-800">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('loginView')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-accent to-cyan-accent flex items-center justify-center text-navy-950 font-black shadow-lg shadow-teal-accent/20">
+                    <i class="fa-solid fa-building-columns text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide text-white flex items-center gap-2">
+                        BankFlow <span class="text-xs px-2 py-0.5 rounded-full bg-teal-accent/10 text-teal-accent border border-teal-accent/20 hidden sm:inline-block">Pro v2.4</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Bank Token Management System • <span class="text-teal-accent font-medium">Team Reflex Squad</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Indicator & Quick Switcher -->
+        <div class="flex items-center gap-3">
+            <div class="hidden md:flex flex-col items-end mr-2">
+                <span class="text-xs text-slate-400">Current Session</span>
+                <span id="navUserDisplay" class="text-xs font-semibold text-teal-accent flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-teal-accent animate-ping"></span> Guest Customer
+                </span>
+            </div>
+            
+            <div id="quickRoleSwitch" class="flex bg-navy-950/80 p-1 rounded-xl border border-navy-700 text-xs">
+                <button onclick="quickSwitchRole('customer')" id="btnRoleCustomer" class="px-3 py-1.5 rounded-lg font-medium transition-all bg-teal-accent text-navy-950">Customer</button>
+                <button onclick="quickSwitchRole('staff')" id="btnRoleStaff" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white">Staff</button>
+                <button onclick="quickSwitchRole('admin')" id="btnRoleAdmin" class="px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white">Admin</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex relative">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 bg-navy-900 border-r border-navy-700 z-30 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 flex flex-col justify-between p-4">
+            <div class="space-y-6">
+                <!-- User Profile Summary in Sidebar -->
+                <div class="p-3 rounded-xl bg-navy-850 border border-navy-700 flex items-center gap-3">
+                    <div id="userAvatar" class="w-10 h-10 rounded-lg bg-teal-accent/20 text-teal-accent flex items-center justify-center font-bold text-lg">
+                        G
+                    </div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarUserName" class="text-sm font-semibold text-white truncate">Guest User</p>
+                        <p id="sidebarUserRole" class="text-xs text-teal-accent capitalize">Customer Portal</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="space-y-1.5">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 mb-2">Main Navigation</div>
+                    
+                    <a href="#" onclick="switchView('loginView')" id="nav-loginView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-right-to-bracket text-teal-accent w-5"></i> Login / Home
+                    </a>
+                    
+                    <a href="#" onclick="switchView('generateView')" id="nav-generateView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-ticket text-teal-accent w-5"></i> Generate Token
+                    </a>
+
+                    <a href="#" onclick="switchView('myTokenView')" id="nav-myTokenView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-user-tag text-teal-accent w-5"></i> My Token
+                    </a>
+
+                    <a href="#" onclick="switchView('liveQueueView')" id="nav-liveQueueView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-list-check text-teal-accent w-5"></i> Live Queue
+                    </a>
+
+                    <a href="#" onclick="switchView('nowServingView')" id="nav-nowServingView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-desktop text-teal-accent w-5"></i> Now Serving Display
+                    </a>
+
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 pt-4 mb-2">Management</div>
+
+                    <a href="#" onclick="switchView('staffView')" id="nav-staffView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-user-shield text-cyan-accent w-5"></i> Counter Dashboard
+                    </a>
+
+                    <a href="#" onclick="switchView('adminView')" id="nav-adminView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-sliders text-cyan-accent w-5"></i> Admin Control
+                    </a>
+
+                    <a href="#" onclick="switchView('reportsView')" id="nav-reportsView" class="nav-btn flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-navy-800 hover:text-white transition-all">
+                        <i class="fa-solid fa-chart-pie text-cyan-accent w-5"></i> Token Reports
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Footer Meta -->
+            <div class="pt-4 border-t border-navy-800 text-xs text-slate-500 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span>System Status</span>
+                    <span class="text-teal-accent font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-accent"></span> Online
+                    </span>
+                </div>
+                <button onclick="resetAllData()" class="w-full text-center text-red-400 hover:text-red-300 text-[11px] py-1 rounded bg-navy-800/50 hover:bg-navy-800 transition">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset Demo Data
+                </button>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay on Mobile -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 hidden lg:hidden"></div>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="flex-1 p-4 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+
+            <!-- ================= VIEW 1: LOGIN PAGE ================= -->
+            <section id="loginView" class="view-panel block space-y-6">
+                <div class="glass-card rounded-2xl p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-96 h-96 bg-teal-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <!-- Left Hero Section (Image Replica blueprint) -->
+                    <div class="lg:col-span-7 space-y-6 relative z-10">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-accent/10 border border-teal-accent/20 text-teal-accent text-xs font-semibold">
+                            <i class="fa-solid fa-shield-halved"></i> Next-Gen Smart Banking Queue
+                        </div>
+                        <h1 class="text-3xl lg:text-5xl font-extrabold text-white leading-tight">
+                            Digital Banking for a <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-accent to-cyan-accent">Smarter Tomorrow</span>
+                        </h1>
+                        <p class="text-slate-300 text-sm lg:text-base leading-relaxed">
+                            Welcome to <strong class="text-white">BankFlow Token System</strong>. Eliminate physical waiting lines, prioritize senior citizens automatically, and track counter progress in real-time.
+                        </p>
+                        
+                        <!-- Quick Role Selection Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                            <button onclick="quickLogin('customer')" class="p-4 rounded-xl bg-navy-850 hover:bg-navy-800 border border-navy-700 hover:border-teal-accent text-left transition-all group">
+                                <i class="fa-solid fa-user text-2xl text-teal-accent mb-2 group-hover:scale-110 transition-transform"></i>
+                                <h3 class="font-bold text-white text-sm">Customer</h3>
+                                <p class="text-xs text-slate-400 mt-1">Get & Track Token</p>
+                            </button>
+
+                            <button onclick="quickLogin('staff')" class="p-4 rounded-xl bg-navy-850 hover:bg-navy-800 border border-navy-700 hover:border-cyan-accent text-left transition-all group">
+                                <i class="fa-solid fa-user-gear text-2xl text-cyan-accent mb-2 group-hover:scale-110 transition-transform"></i>
+                                <h3 class="font-bold text-white text-sm">Staff Login</h3>
+                                <p class="text-xs text-slate-400 mt-1">Manage Counter Queue</p>
+                            </button>
+
+                            <button onclick="quickLogin('admin')" class="p-4 rounded-xl bg-navy-850 hover:bg-navy-800 border border-navy-700 hover:border-purple-400 text-left transition-all group">
+                                <i class="fa-solid fa-shield-cat text-2xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
+                                <h3 class="font-bold text-white text-sm">Admin Panel</h3>
+                                <p class="text-xs text-slate-400 mt-1">Full System Control</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Login Box -->
+                    <div class="lg:col-span-5 glass-card p-6 lg:p-8 rounded-2xl border border-navy-700 relative z-10">
+                        <div class="text-center mb-6">
+                            <div class="w-14 h-14 bg-teal-accent/20 border border-teal-accent/30 rounded-2xl flex items-center justify-center mx-auto mb-3 text-teal-accent text-2xl">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-white">System Portal Authentication</h2>
+                            <p class="text-xs text-slate-400 mt-1">Select role and enter details to proceed</p>
+                        </div>
+
+                        <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Select Access Role</label>
+                                <select id="loginRole" class="w-full bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-teal-accent">
+                                    <option value="customer">Customer Access</option>
+                                    <option value="staff">Staff Counter Operator</option>
+                                    <option value="admin">System Administrator</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Username / Email</label>
+                                <input type="text" id="loginUser" required value="mohitchaudhari1062008@gmail.com" placeholder="Enter username..." class="w-full bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-teal-accent">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                                <input type="password" id="loginPass" required value="••••••••" class="w-full bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-teal-accent">
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs text-slate-400">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded border-navy-700 bg-navy-950 text-teal-accent focus:ring-0">
+                                    Remember me
+                                </label>
+                                <a href="#" onclick="alert('Demo Mode: Password recovery not needed. Click login to proceed.')" class="hover:text-teal-accent">Forgot Password?</a>
+                            </div>
+
+                            <button type="submit" class="w-full bg-gradient-to-r from-teal-accent to-teal-hover text-navy-950 font-bold py-3 rounded-xl transition shadow-lg shadow-teal-accent/20 hover:opacity-95 flex items-center justify-center gap-2">
+                                <span>Sign In to Dashboard</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 2: CUSTOMER TOKEN GENERATION ================= -->
+            <section id="generateView" class="view-panel hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 lg:p-8">
+                    <div class="max-w-3xl mx-auto space-y-6">
+                        <div class="border-b border-navy-700 pb-4">
+                            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-ticket text-teal-accent"></i> Get Your Banking Token
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">Fill in details below to generate a real-time queue position.</p>
+                        </div>
+
+                        <form onsubmit="handleGenerateToken(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name *</label>
+                                    <input type="text" id="genName" required placeholder="e.g. Mohit Chaudhari" class="w-full bg-navy-950 border border-navy-700 rounded-xl px-4 py-3 text-sm text-white focus:border-teal-accent focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Mobile Number *</label>
+                                    <input type="tel" id="genPhone" required pattern="[0-9]{10}" placeholder="10-digit phone number" class="w-full bg-navy-950 border border-navy-700 rounded-xl px-4 py-3 text-sm text-white focus:border-teal-accent focus:outline-none">
+                                </div>
+                            </div>
+
+                            <!-- Senior Citizen Checkbox -->
+                            <div class="p-4 rounded-xl bg-navy-850/80 border border-navy-700 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center text-lg">
+                                        <i class="fa-solid fa-person-cane"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Senior Citizen / Special Priority (60+)</p>
+                                        <p class="text-xs text-slate-400">Gets fast-tracked automatically into Priority Queue (P-Series)</p>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="genPriority" class="w-5 h-5 rounded border-navy-700 bg-navy-950 text-teal-accent focus:ring-0 cursor-pointer">
+                            </div>
+
+                            <!-- Banking Service Selection -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Select Banking Service *</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="serviceOptions">
+                                    <!-- Dynamic Radio Service Buttons -->
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-gradient-to-r from-teal-accent to-cyan-accent text-navy-950 font-extrabold text-base py-4 rounded-xl shadow-lg shadow-teal-accent/20 hover:opacity-95 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-plus-circle text-lg"></i>
+                                <span>GENERATE TOKEN NOW</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 3: CUSTOMER DASHBOARD (MY TOKEN) ================= -->
+            <section id="myTokenView" class="view-panel hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Customer Token Portal</h2>
+                        <p class="text-xs text-slate-400">Live queue tracking for your personal token</p>
+                    </div>
+                    <button onclick="switchView('generateView')" class="px-4 py-2 rounded-xl bg-navy-800 hover:bg-navy-700 text-teal-accent text-xs font-bold border border-teal-accent/30 transition">
+                        + New Token
+                    </button>
+                </div>
+
+                <div id="noActiveTokenCard" class="glass-card p-12 text-center rounded-2xl hidden">
+                    <i class="fa-solid fa-ticket text-5xl text-slate-600 mb-3"></i>
+                    <h3 class="text-xl font-bold text-white">No Active Token Found</h3>
+                    <p class="text-sm text-slate-400 mt-1 max-w-md mx-auto">You haven't generated a token yet in this session. Click below to issue a token now.</p>
+                    <button onclick="switchView('generateView')" class="mt-4 px-6 py-2.5 rounded-xl bg-teal-accent text-navy-950 font-bold text-sm">Generate Token</button>
+                </div>
+
+                <div id="activeTokenContainer" class="space-y-6">
+                    <!-- Section 4 Image Replica Active Token Box -->
+                    <div class="glass-card rounded-2xl p-6 lg:p-8 relative overflow-hidden border border-teal-accent/30">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div class="text-center md:text-left">
+                                <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Your Issued Token</span>
+                                <div id="myTokenNumber" class="text-5xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-accent to-cyan-accent my-1">
+                                    A-025
+                                </div>
+                                <div id="myTokenBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold badge-waiting">
+                                    <i class="fa-solid fa-clock"></i> Waiting in Queue
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full md:w-auto">
+                                <div class="bg-navy-950/80 p-4 rounded-xl border border-navy-700 text-center">
+                                    <span class="text-[11px] text-slate-400 block">Service Selected</span>
+                                    <span id="myTokenService" class="text-sm font-bold text-white">Cash Withdrawal</span>
+                                </div>
+                                <div class="bg-navy-950/80 p-4 rounded-xl border border-navy-700 text-center">
+                                    <span class="text-[11px] text-slate-400 block">Assigned Counter</span>
+                                    <span id="myTokenCounter" class="text-sm font-bold text-teal-accent">Counter 03</span>
+                                </div>
+                                <div class="bg-navy-950/80 p-4 rounded-xl border border-navy-700 text-center col-span-2 sm:col-span-1">
+                                    <span class="text-[11px] text-slate-400 block">Estimated Wait</span>
+                                    <span id="myTokenEstWait" class="text-sm font-bold text-yellow-400">~15 min</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Stepper (Section 4 Replica) -->
+                        <div class="mt-8 pt-6 border-t border-navy-700/80">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6">Live Queue Timeline</h4>
+                            <div class="relative flex items-center justify-between max-w-3xl mx-auto px-4">
+                                <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-navy-800 z-0"></div>
+                                <div id="stepperProgressBar" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-teal-accent transition-all duration-500 z-0" style="width: 25%;"></div>
+
+                                <!-- Step 1 -->
+                                <div class="relative z-10 text-center">
+                                    <div id="step1-dot" class="w-9 h-9 rounded-full bg-teal-accent text-navy-950 font-bold flex items-center justify-center mx-auto text-sm shadow-md shadow-teal-accent/20">1</div>
+                                    <span class="text-xs font-semibold text-white block mt-2">Generated</span>
+                                </div>
+                                <!-- Step 2 -->
+                                <div class="relative z-10 text-center">
+                                    <div id="step2-dot" class="w-9 h-9 rounded-full bg-navy-800 text-slate-400 font-bold flex items-center justify-center mx-auto text-sm border border-navy-700">2</div>
+                                    <span class="text-xs font-semibold text-slate-400 block mt-2">Waiting</span>
+                                </div>
+                                <!-- Step 3 -->
+                                <div class="relative z-10 text-center">
+                                    <div id="step3-dot" class="w-9 h-9 rounded-full bg-navy-800 text-slate-400 font-bold flex items-center justify-center mx-auto text-sm border border-navy-700">3</div>
+                                    <span class="text-xs font-semibold text-slate-400 block mt-2">Called</span>
+                                </div>
+                                <!-- Step 4 -->
+                                <div class="relative z-10 text-center">
+                                    <div id="step4-dot" class="w-9 h-9 rounded-full bg-navy-800 text-slate-400 font-bold flex items-center justify-center mx-auto text-sm border border-navy-700">4</div>
+                                    <span class="text-xs font-semibold text-slate-400 block mt-2">At Counter</span>
+                                </div>
+                                <!-- Step 5 -->
+                                <div class="relative z-10 text-center">
+                                    <div id="step5-dot" class="w-9 h-9 rounded-full bg-navy-800 text-slate-400 font-bold flex items-center justify-center mx-auto text-sm border border-navy-700">5</div>
+                                    <span class="text-xs font-semibold text-slate-400 block mt-2">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 4: LIVE QUEUE PAGE ================= -->
+            <section id="liveQueueView" class="view-panel hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-teal-accent"></i> Live Banking Queue
+                            </h2>
+                            <p class="text-xs text-slate-400">Priority customer requests are processed first automatically.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="queueSearch" oninput="renderLiveQueueTable()" placeholder="Search customer or token..." class="bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-accent w-48">
+                            <select id="queueStatusFilter" onchange="renderLiveQueueTable()" class="bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-accent">
+                                <option value="ALL">All Status</option>
+                                <option value="Serving">Serving</option>
+                                <option value="Waiting">Waiting</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live Queue Table Section 5 Replica -->
+                    <div class="overflow-x-auto rounded-xl border border-navy-700">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-navy-950 text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                                <tr>
+                                    <th class="p-3.5">Token No</th>
+                                    <th class="p-3.5">Customer Name</th>
+                                    <th class="p-3.5">Service Requested</th>
+                                    <th class="p-3.5">Category</th>
+                                    <th class="p-3.5">Est. Wait</th>
+                                    <th class="p-3.5">Counter</th>
+                                    <th class="p-3.5 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="liveQueueTbody" class="divide-y divide-navy-800/60 bg-navy-900/40">
+                                <!-- Dynamic JS Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 5: NOW SERVING TV/MONITOR DISPLAY ================= -->
+            <section id="nowServingView" class="view-panel hidden space-y-6">
+                <div class="glass-card rounded-2xl p-8 lg:p-12 text-center max-w-4xl mx-auto border-2 border-teal-accent/30 pulse-now-serving relative overflow-hidden">
+                    <div class="absolute top-4 right-4 text-xs font-mono text-teal-accent bg-teal-accent/10 px-3 py-1 rounded-full border border-teal-accent/20">
+                        <i class="fa-solid fa-tower-broadcast animate-pulse"></i> LIVE DISPLAY
+                    </div>
+
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">NOW SERVING AT COUNTERS</h3>
+
+                    <div class="my-8">
+                        <div id="nowServingToken" class="text-7xl lg:text-9xl font-black text-white tracking-wider my-2">
+                            A-021
+                        </div>
+                        <p class="text-slate-300 text-lg">Please proceed to</p>
+                        <div id="nowServingCounter" class="text-3xl lg:text-5xl font-extrabold text-teal-accent mt-2">
+                            COUNTER 02
+                        </div>
+                    </div>
+
+                    <!-- Audio Signal Simulation Badge -->
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-navy-950 border border-navy-700 text-xs text-slate-300">
+                        <i class="fa-solid fa-volume-high text-teal-accent animate-bounce"></i> Audio announcement active in main banking hall
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 6: STAFF / COUNTER DASHBOARD ================= -->
+            <section id="staffView" class="view-panel hidden space-y-6">
+                <!-- Stat Cards (Section 6 Image Replica) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-4 rounded-xl border border-navy-700 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 block">People Waiting</span>
+                            <span id="statPeopleWaiting" class="text-2xl font-bold text-white">12</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-yellow-500/10 text-yellow-400 flex items-center justify-center text-lg"><i class="fa-solid fa-users"></i></div>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-xl border border-navy-700 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Active Counters</span>
+                            <span id="statActiveCounters" class="text-2xl font-bold text-teal-accent">4/5</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-teal-accent/10 text-teal-accent flex items-center justify-center text-lg"><i class="fa-solid fa-desktop"></i></div>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-xl border border-navy-700 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Average Wait</span>
+                            <span id="statAvgWait" class="text-2xl font-bold text-cyan-accent">18 min</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-cyan-accent/10 text-cyan-accent flex items-center justify-center text-lg"><i class="fa-solid fa-clock"></i></div>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-xl border border-navy-700 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Tokens Served</span>
+                            <span id="statTokensServed" class="text-2xl font-bold text-purple-400">126</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg"><i class="fa-solid fa-circle-check"></i></div>
+                    </div>
+                </div>
+
+                <!-- Staff Action Console & Counter Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Call Next Token Operator Controls -->
+                    <div class="lg:col-span-5 glass-card p-6 rounded-2xl space-y-6">
+                        <div class="border-b border-navy-700 pb-3 flex items-center justify-between">
+                            <h3 class="font-bold text-white text-base">Counter Console Operator</h3>
+                            <select id="staffSelectedCounter" onchange="updateStaffConsoleUI()" class="bg-navy-950 border border-navy-700 rounded-lg px-2.5 py-1 text-xs text-teal-accent font-bold">
+                                <option value="1">Counter 01</option>
+                                <option value="2" selected>Counter 02</option>
+                                <option value="3">Counter 03</option>
+                                <option value="4">Counter 04</option>
+                                <option value="5">Counter 05</option>
+                            </select>
+                        </div>
+
+                        <div class="bg-navy-950/80 p-5 rounded-xl border border-navy-700 text-center space-y-2">
+                            <span class="text-xs text-slate-400 uppercase font-semibold">Currently Serving at Counter</span>
+                            <div id="staffActiveToken" class="text-4xl font-extrabold text-teal-accent">A-021</div>
+                            <p id="staffActiveCustomer" class="text-xs text-slate-300">Customer: Rahul Sharma (Cash Withdrawal)</p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="space-y-2.5">
+                            <button onclick="staffCallNextToken()" class="w-full bg-gradient-to-r from-teal-accent to-teal-hover text-navy-950 font-extrabold py-3.5 rounded-xl text-sm shadow-lg shadow-teal-accent/20 hover:opacity-95 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-bullhorn text-lg"></i>
+                                <span>CALL NEXT TOKEN</span>
+                            </button>
+
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="staffCompleteService()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-bold py-2.5 rounded-xl text-xs transition">
+                                    <i class="fa-solid fa-check mr-1"></i> Complete
+                                </button>
+                                <button onclick="staffSkipToken()" class="bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 border border-yellow-500/30 font-bold py-2.5 rounded-xl text-xs transition">
+                                    <i class="fa-solid fa-forward mr-1"></i> Skip
+                                </button>
+                                <button onclick="staffTransferToken()" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 font-bold py-2.5 rounded-xl text-xs transition">
+                                    <i class="fa-solid fa-share mr-1"></i> Transfer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Counter Status Cards (Section 6 Image Replica) -->
+                    <div class="lg:col-span-7 glass-card p-6 rounded-2xl space-y-4">
+                        <h3 class="font-bold text-white text-base">Counter Live Overview</h3>
+                        <div id="counterCardsGrid" class="space-y-3">
+                            <!-- Dynamic Cards generated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 7: ADMIN PANEL ================= -->
+            <section id="adminView" class="view-panel hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 space-y-6">
+                    <div class="border-b border-navy-700 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-cyan-accent"></i> Administrator Control Panel
+                            </h2>
+                            <p class="text-xs text-slate-400">Manage queue flows, active bank counters, and system parameters.</p>
+                        </div>
+                        <button onclick="addNewCounter()" class="px-4 py-2 rounded-xl bg-teal-accent text-navy-950 font-bold text-xs hover:bg-teal-hover transition">
+                            + Add New Counter
+                        </button>
+                    </div>
+
+                    <!-- Queue Management Table Section 7 Replica -->
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-bold text-white">Full Queue Overview & Force Control</h3>
+                        <div class="overflow-x-auto rounded-xl border border-navy-700">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="bg-navy-950 text-slate-400 uppercase text-[10px] font-bold">
+                                    <tr>
+                                        <th class="p-3">Token</th>
+                                        <th class="p-3">Customer</th>
+                                        <th class="p-3">Service</th>
+                                        <th class="p-3">Priority</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminQueueTbody" class="divide-y divide-navy-800/60 bg-navy-900/40">
+                                    <!-- Dynamic JS Injection -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 8: TOKEN REPORTS / HISTORY ================= -->
+            <section id="reportsView" class="view-panel hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-navy-700 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-cyan-accent"></i> Token History & Analytics
+                            </h2>
+                            <p class="text-xs text-slate-400">Complete historical transaction logs for completed services.</p>
+                        </div>
+                        <button onclick="exportToCSV()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-teal-accent to-cyan-accent text-navy-950 font-bold text-xs flex items-center gap-2 shadow-md">
+                            <i class="fa-solid fa-file-csv text-base"></i> Export CSV Report
+                        </button>
+                    </div>
+
+                    <!-- History Table Section 8 Replica -->
+                    <div class="overflow-x-auto rounded-xl border border-navy-700">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-navy-950 text-slate-400 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="p-3.5">Token No</th>
+                                    <th class="p-3.5">Customer Name</th>
+                                    <th class="p-3.5">Service</th>
+                                    <th class="p-3.5">Counter Served</th>
+                                    <th class="p-3.5">Time Logged</th>
+                                    <th class="p-3.5 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTbody" class="divide-y divide-navy-800/60 bg-navy-900/40">
+                                <!-- Dynamic JS Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- TICKET GENERATED MODAL (Section 3 Replica) -->
+    <div id="ticketModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl p-6 border-2 border-teal-accent/40 shadow-2xl space-y-4 text-center relative animate-fade-in">
+            <button onclick="closeModal('ticketModal')" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-12 h-12 rounded-full bg-teal-accent/20 text-teal-accent border border-teal-accent/40 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <h3 class="text-xl font-bold text-white">Your Token is Generated!</h3>
+
+            <!-- Ticket Card Box -->
+            <div id="modalTicketBox" class="bg-navy-950 p-6 rounded-xl border border-navy-700 space-y-3">
+                <span class="text-xs text-slate-400 uppercase tracking-widest block font-semibold">TOKEN NUMBER</span>
+                <div id="modalTokenNo" class="text-5xl font-black text-teal-accent tracking-wider">A-025</div>
+                
+                <div class="grid grid-cols-2 gap-2 text-left pt-3 border-t border-navy-800 text-xs">
+                    <div>
+                        <span class="text-slate-500 block">Customer:</span>
+                        <span id="modalCustomer" class="font-bold text-white">Mohit Chaudhari</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Service:</span>
+                        <span id="modalService" class="font-bold text-white">Cash Withdrawal</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Est. Wait Time:</span>
+                        <span id="modalWait" class="font-bold text-yellow-400">15 min</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Queue Category:</span>
+                        <span id="modalCategory" class="font-bold text-teal-accent">Normal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="window.print()" class="flex-1 py-2.5 rounded-xl bg-navy-800 text-slate-200 text-xs font-bold hover:bg-navy-700 border border-navy-700">
+                    <i class="fa-solid fa-print mr-1"></i> Print Ticket
+                </button>
+                <button onclick="closeModal('ticketModal'); switchView('myTokenView')" class="flex-1 py-2.5 rounded-xl bg-teal-accent text-navy-950 text-xs font-extrabold hover:bg-teal-hover">
+                    View Live Tracker
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SYSTEM FOOTER -->
+    <footer class="bg-navy-950 border-t border-navy-800 py-3 text-center text-xs text-slate-500">
+        Bank Token Management System • Designed & Built by <strong class="text-teal-accent">Team Reflex Squad</strong> • Digital Banking Blueprint
+    </footer>
+
+    <script>
+        const SERVICES = [
+            { id: 'dep', name: 'Cash Deposit', icon: 'fa-money-bill-transfer' },
+            { id: 'wit', name: 'Cash Withdrawal', icon: 'fa-hand-holding-dollar' },
+            { id: 'acc', name: 'Account Opening', icon: 'fa-user-plus' },
+            { id: 'lon', name: 'Loan Enquiry', icon: 'fa-file-invoice-dollar' },
+            { id: 'sen', name: 'Senior Citizen Service', icon: 'fa-person-cane' },
+            { id: 'gen', name: 'General Banking', icon: 'fa-building-columns' },
+            { id: 'chk', name: 'Cheque Service', icon: 'fa-money-check' }
+        ];
+
+        const SEED_QUEUES = [
+            { token: 'A-015', name: 'Rahul Patil', service: 'Cash Withdrawal', priority: false, status: 'Serving', counter: 'Counter 01', time: '10:15 AM' },
+            { token: 'P-016', name: 'Suresh Jadhav', service: 'Senior Citizen Service', priority: true, status: 'Serving', counter: 'Counter 03', time: '10:18 AM' },
+            { token: 'A-017', name: 'Neha More', service: 'Account Opening', priority: false, status: 'Waiting', counter: 'Unassigned', time: '10:20 AM' },
+            { token: 'A-018', name: 'Amit Shinde', service: 'General Banking', priority: false, status: 'Waiting', counter: 'Unassigned', time: '10:22 AM' },
+            { token: 'A-019', name: 'Pooja Pawar', service: 'Cash Deposit', priority: false, status: 'Waiting', counter: 'Unassigned', time: '10:25 AM' },
+            { token: 'A-020', name: 'Vikas Patil', service: 'Loan Enquiry', priority: false, status: 'Waiting', counter: 'Unassigned', time: '10:28 AM' }
+        ];
+
+        const SEED_COUNTERS = [
+            { id: 1, name: 'Counter 01', status: 'Active', token: 'A-015' },
+            { id: 2, name: 'Counter 02', status: 'Active', token: 'A-014' },
+            { id: 3, name: 'Counter 03', status: 'Active', token: 'P-016' },
+            { id: 4, name: 'Counter 04', status: 'Available', token: '-' },
+            { id: 5, name: 'Counter 05', status: 'Available', token: '-' }
+        ];
+
+        // Global State initialized from LocalStorage or Default
+        let queues = JSON.parse(localStorage.getItem('ref_queues')) || SEED_QUEUES;
+        let counters = JSON.parse(localStorage.getItem('ref_counters')) || SEED_COUNTERS;
+        let normalCounter = parseInt(localStorage.getItem('ref_normalCounter')) || 21;
+        let priorityCounter = parseInt(localStorage.getItem('ref_priorityCounter')) || 17;
+        let currentUser = JSON.parse(localStorage.getItem('ref_currentUser')) || { name: 'Mohit Chaudhari', role: 'customer' };
+        let activeUserToken = localStorage.getItem('ref_activeUserToken') || 'A-020';
+
+        window.onload = function() {
+            renderServiceOptions();
+            updateRoleUI();
+            renderAllViews();
+        };
+
+        function saveData() {
+            localStorage.setItem('ref_queues', JSON.stringify(queues));
+            localStorage.setItem('ref_counters', JSON.stringify(counters));
+            localStorage.setItem('ref_normalCounter', normalCounter);
+            localStorage.setItem('ref_priorityCounter', priorityCounter);
+            localStorage.setItem('ref_currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('ref_activeUserToken', activeUserToken);
+        }
+
+        function resetAllData() {
+            localStorage.clear();
+            queues = SEED_QUEUES;
+            counters = SEED_COUNTERS;
+            normalCounter = 21;
+            priorityCounter = 17;
+            currentUser = { name: 'Mohit Chaudhari', role: 'customer' };
+            activeUserToken = 'A-020';
+            saveData();
+            renderAllViews();
+            alert('Demo data restored successfully!');
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('bg-navy-800', 'text-teal-accent'));
+            const activeNav = document.getElementById('nav-' + viewId);
+            if (activeNav) activeNav.classList.add('bg-navy-800', 'text-teal-accent');
+
+            if (window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebarOverlay').classList.add('hidden');
+            }
+
+            renderAllViews();
+        }
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sb.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function quickSwitchRole(role) {
+            currentUser.role = role;
+            if (role === 'customer') currentUser.name = 'Mohit Chaudhari';
+            if (role === 'staff') currentUser.name = 'Counter Operator';
+            if (role === 'admin') currentUser.name = 'Reflex Admin';
+            saveData();
+            updateRoleUI();
+
+            if (role === 'customer') switchView('myTokenView');
+            else if (role === 'staff') switchView('staffView');
+            else if (role === 'admin') switchView('adminView');
+        }
+
+        function updateRoleUI() {
+            document.getElementById('sidebarUserName').innerText = currentUser.name;
+            document.getElementById('sidebarUserRole').innerText = currentUser.role + ' Portal';
+            document.getElementById('navUserDisplay').innerHTML = `<span class="w-2 h-2 rounded-full bg-teal-accent animate-ping"></span> ${currentUser.name} (${currentUser.role})`;
+            document.getElementById('userAvatar').innerText = currentUser.name.charAt(0);
+
+            // Toggle switch buttons styling
+            ['Customer', 'Staff', 'Admin'].forEach(r => {
+                const btn = document.getElementById('btnRole' + r);
+                if (r.toLowerCase() === currentUser.role) {
+                    btn.className = "px-3 py-1.5 rounded-lg font-medium transition-all bg-teal-accent text-navy-950";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white";
+                }
+            });
+        }
+
+        function renderServiceOptions() {
+            const container = document.getElementById('serviceOptions');
+            container.innerHTML = SERVICES.map((s, idx) => `
+                <label class="p-3.5 rounded-xl bg-navy-950 border border-navy-700 hover:border-teal-accent/50 flex items-center gap-3 cursor-pointer transition">
+                    <input type="radio" name="bankingService" value="${s.name}" ${idx === 0 ? 'checked' : ''} class="text-teal-accent focus:ring-0">
+                    <i class="fa-solid ${s.icon} text-teal-accent text-base"></i>
+                    <span class="text-xs font-semibold text-white">${s.name}</span>
+                </label>
+            `).join('');
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const role = document.getElementById('loginRole').value;
+            const user = document.getElementById('loginUser').value;
+            currentUser = { name: user || 'Bank User', role: role };
+            saveData();
+            updateRoleUI();
+            if (role === 'customer') switchView('generateView');
+            else if (role === 'staff') switchView('staffView');
+            else switchView('adminView');
+        }
+
+        function quickLogin(role) {
+            quickSwitchRole(role);
+        }
+
+        function handleGenerateToken(e) {
+            e.preventDefault();
+            const name = document.getElementById('genName').value;
+            const phone = document.getElementById('genPhone').value;
+            const isPriority = document.getElementById('genPriority').checked;
+            const service = document.querySelector('input[name="bankingService"]:checked').value;
+
+            let tokenNum = '';
+            if (isPriority) {
+                tokenNum = 'P-' + String(priorityCounter).padStart(3, '0');
+                priorityCounter++;
+            } else {
+                tokenNum = 'A-' + String(normalCounter).padStart(3, '0');
+                normalCounter++;
+            }
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const newTicket = {
+                token: tokenNum,
+                name: name,
+                service: service,
+                priority: isPriority,
+                status: 'Waiting',
+                counter: 'Unassigned',
+                time: timeStr
+            };
+
+            queues.push(newTicket);
+            activeUserToken = tokenNum;
+            currentUser.name = name;
+            saveData();
+
+            // Populate Modal
+            document.getElementById('modalTokenNo').innerText = tokenNum;
+            document.getElementById('modalCustomer').innerText = name;
+            document.getElementById('modalService').innerText = service;
+            document.getElementById('modalWait').innerText = isPriority ? '~5 min' : '~15 min';
+            document.getElementById('modalCategory').innerText = isPriority ? 'Senior / Priority' : 'Normal';
+
+            document.getElementById('ticketModal').classList.remove('hidden');
+            renderAllViews();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function renderAllViews() {
+            renderMyTokenView();
+            renderLiveQueueTable();
+            renderNowServingDisplay();
+            renderStaffDashboard();
+            renderAdminPanel();
+            renderReportsTable();
+        }
+
+        function renderMyTokenView() {
+            const myToken = queues.find(q => q.token === activeUserToken);
+            const activeCard = document.getElementById('activeTokenContainer');
+            const emptyCard = document.getElementById('noActiveTokenCard');
+
+            if (!myToken) {
+                activeCard.classList.add('hidden');
+                emptyCard.classList.remove('hidden');
+                return;
+            }
+
+            activeCard.classList.remove('hidden');
+            emptyCard.classList.add('hidden');
+
+            document.getElementById('myTokenNumber').innerText = myToken.token;
+            document.getElementById('myTokenService').innerText = myToken.service;
+            document.getElementById('myTokenCounter').innerText = myToken.counter;
+
+            // Stepper progress calculation
+            let width = '20%';
+            if (myToken.status === 'Waiting') width = '40%';
+            if (myToken.status === 'Serving') width = '75%';
+            if (myToken.status === 'Completed') width = '100%';
+            document.getElementById('stepperProgressBar').style.width = width;
+        }
+
+        function renderLiveQueueTable() {
+            const tbody = document.getElementById('liveQueueTbody');
+            const query = document.getElementById('queueSearch')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('queueStatusFilter')?.value || 'ALL';
+
+            // Priority sorting: Priority items first
+            let filtered = queues.filter(q => q.status !== 'Completed');
+            if (statusFilter !== 'ALL') filtered = filtered.filter(q => q.status === statusFilter);
+            if (query) filtered = filtered.filter(q => q.name.toLowerCase().includes(query) || q.token.toLowerCase().includes(query));
+
+            filtered.sort((a, b) => (b.priority === a.priority) ? 0 : b.priority ? 1 : -1);
+
+            tbody.innerHTML = filtered.map(q => `
+                <tr class="hover:bg-navy-800/40 transition ${q.token === activeUserToken ? 'bg-teal-accent/5 border-l-2 border-teal-accent' : ''}">
+                    <td class="p-3.5 font-bold text-white">${q.token}</td>
+                    <td class="p-3.5 font-semibold">${q.name} ${q.token === activeUserToken ? '<span class="text-[9px] text-teal-accent bg-teal-accent/10 px-1.5 py-0.5 rounded ml-1">YOU</span>' : ''}</td>
+                    <td class="p-3.5">${q.service}</td>
+                    <td class="p-3.5">${q.priority ? '<span class="badge-priority px-2 py-0.5 rounded-full text-[10px]">Priority</span>' : '<span class="text-slate-400">Normal</span>'}</td>
+                    <td class="p-3.5 text-yellow-400">${q.priority ? '~5m' : '~15m'}</td>
+                    <td class="p-3.5">${q.counter}</td>
+                    <td class="p-3.5 text-right">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${q.status === 'Serving' ? 'badge-serving' : 'badge-waiting'}">${q.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderNowServingDisplay() {
+            const currentServing = queues.find(q => q.status === 'Serving') || queues[0];
+            if (currentServing) {
+                document.getElementById('nowServingToken').innerText = currentServing.token;
+                document.getElementById('nowServingCounter').innerText = currentServing.counter !== 'Unassigned' ? currentServing.counter : 'COUNTER 01';
+            }
+        }
+
+        function renderStaffDashboard() {
+            // Stats
+            const waitingCount = queues.filter(q => q.status === 'Waiting').length;
+            const servedCount = queues.filter(q => q.status === 'Completed').length;
+
+            document.getElementById('statPeopleWaiting').innerText = waitingCount;
+            document.getElementById('statTokensServed').innerText = servedCount;
+
+            // Render Counter Cards
+            const grid = document.getElementById('counterCardsGrid');
+            grid.innerHTML = counters.map(c => `
+                <div class="bg-navy-950/70 p-3.5 rounded-xl border border-navy-700 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-navy-800 text-teal-accent font-bold flex items-center justify-center text-xs">
+                            ${c.id}
+                        </div>
+                        <div>
+                            <p class="font-bold text-white text-xs">${c.name}</p>
+                            <span class="text-[10px] text-slate-400">Current: <strong class="text-teal-accent">${c.token}</strong></span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${c.status === 'Active' ? 'badge-serving' : 'badge-waiting'}">${c.status}</span>
+                </div>
+            `).join('');
+
+            updateStaffConsoleUI();
+        }
+
+        function updateStaffConsoleUI() {
+            const counterId = document.getElementById('staffSelectedCounter').value;
+            const counterObj = counters.find(c => c.id == counterId);
+            const activeTokenObj = queues.find(q => q.counter === 'Counter 0' + counterId && q.status === 'Serving');
+
+            if (activeTokenObj) {
+                document.getElementById('staffActiveToken').innerText = activeTokenObj.token;
+                document.getElementById('staffActiveCustomer').innerText = `Customer: ${activeTokenObj.name} (${activeTokenObj.service})`;
+            } else {
+                document.getElementById('staffActiveToken').innerText = 'NONE';
+                document.getElementById('staffActiveCustomer').innerText = 'Counter Available for Next Token';
+            }
+        }
+
+        function staffCallNextToken() {
+            const counterId = document.getElementById('staffSelectedCounter').value;
+            const counterName = 'Counter 0' + counterId;
+
+            // Priority Queue Check: Serve Priority waiting first
+            let nextIndex = queues.findIndex(q => q.status === 'Waiting' && q.priority);
+            if (nextIndex === -1) {
+                nextIndex = queues.findIndex(q => q.status === 'Waiting');
+            }
+
+            if (nextIndex === -1) {
+                alert('No waiting customers in line!');
+                return;
+            }
+
+            // Mark previous serving at this counter completed
+            queues.forEach(q => {
+                if (q.counter === counterName && q.status === 'Serving') {
+                    q.status = 'Completed';
+                }
+            });
+
+            // Assign new token
+            queues[nextIndex].status = 'Serving';
+            queues[nextIndex].counter = counterName;
+
+            // Update Counter status
+            const cnt = counters.find(c => c.id == counterId);
+            if (cnt) {
+                cnt.status = 'Active';
+                cnt.token = queues[nextIndex].token;
+            }
+
+            saveData();
+            renderAllViews();
+        }
+
+        function staffCompleteService() {
+            const counterId = document.getElementById('staffSelectedCounter').value;
+            const counterName = 'Counter 0' + counterId;
+            const tokenObj = queues.find(q => q.counter === counterName && q.status === 'Serving');
+
+            if (tokenObj) {
+                tokenObj.status = 'Completed';
+                const cnt = counters.find(c => c.id == counterId);
+                if (cnt) cnt.token = '-';
+                saveData();
+                renderAllViews();
+            }
+        }
+
+        function staffSkipToken() {
+            const counterId = document.getElementById('staffSelectedCounter').value;
+            const counterName = 'Counter 0' + counterId;
+            const tokenObj = queues.find(q => q.counter === counterName && q.status === 'Serving');
+
+            if (tokenObj) {
+                tokenObj.status = 'Waiting';
+                tokenObj.counter = 'Unassigned';
+                saveData();
+                renderAllViews();
+            }
+        }
+
+        function staffTransferToken() {
+            alert('Token transferred to Senior Specialist Desk.');
+        }
+
+        function renderAdminPanel() {
+            const tbody = document.getElementById('adminQueueTbody');
+            tbody.innerHTML = queues.map((q, idx) => `
+                <tr class="hover:bg-navy-800/40 transition">
+                    <td class="p-3 font-bold text-white">${q.token}</td>
+                    <td class="p-3">${q.name}</td>
+                    <td class="p-3">${q.service}</td>
+                    <td class="p-3">${q.priority ? 'Priority' : 'Normal'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] ${q.status === 'Serving' ? 'badge-serving' : 'badge-waiting'}">${q.status}</span></td>
+                    <td class="p-3 text-right">
+                        <button onclick="adminRemoveToken(${idx})" class="text-red-400 hover:text-red-300 px-2 py-1 bg-red-500/10 rounded"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function adminRemoveToken(idx) {
+            queues.splice(idx, 1);
+            saveData();
+            renderAllViews();
+        }
+
+        function addNewCounter() {
+            const newId = counters.length + 1;
+            counters.push({ id: newId, name: 'Counter 0' + newId, status: 'Available', token: '-' });
+            saveData();
+            renderAllViews();
+        }
+
+        function renderReportsTable() {
+            const tbody = document.getElementById('reportsTbody');
+            const history = queues.filter(q => q.status === 'Completed' || q.status === 'Serving');
+
+            tbody.innerHTML = history.map(q => `
+                <tr class="hover:bg-navy-800/40">
+                    <td class="p-3.5 font-bold text-teal-accent">${q.token}</td>
+                    <td class="p-3.5">${q.name}</td>
+                    <td class="p-3.5">${q.service}</td>
+                    <td class="p-3.5">${q.counter}</td>
+                    <td class="p-3.5 text-slate-400">${q.time}</td>
+                    <td class="p-3.5 text-right"><span class="badge-completed px-2.5 py-0.5 rounded-full text-[10px]">${q.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        /* CSV Export Feature */
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Token,Customer,Service,Counter,Time,Status\n";
+            queues.forEach(q => {
+                csvContent += `${q.token},"${q.name}","${q.service}",${q.counter},${q.time},${q.status}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "BankTokens_Report_ReflexSquad.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
